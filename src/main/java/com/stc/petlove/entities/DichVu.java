@@ -24,7 +24,6 @@ public class DichVu {
     // mã dịch vụ không được trùng
     private String maDichVu;
 
-
     private String tenDichVu;
 
     // nội dung là html

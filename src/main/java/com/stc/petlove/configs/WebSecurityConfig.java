@@ -25,11 +25,22 @@ public class WebSecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private final JwtTokenFilter jwtTokenFilter;
+    private final List<String> POSTS = Arrays.asList(
+            "/api/v1/auth/login/**",
+            "/api/v1/taikhoan/create/**",
+            "/api/v1/datcho/create/**",
+            "/api/v1/dichvu/create/**"
 
-
-    private final List<String> pattern = Arrays.asList(
-            "/rest/login/**"
     );
+
+    private final List<String> GETS = Arrays.asList(
+            "/api/v1/dichvu/**",
+            "/api/v1/loaithucung/**"
+    );
+
+    private final List<String> PATCHS = Arrays.asList(
+            "/api/v1/datcho/**"
+            );
 
     public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtTokenFilter jwtTokenFilter) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
@@ -45,10 +56,10 @@ public class WebSecurityConfig {
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/v3/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers(HttpMethod.POST, pattern.toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.GET, GETS.toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.PATCH, PATCHS.toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.POST, POSTS.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

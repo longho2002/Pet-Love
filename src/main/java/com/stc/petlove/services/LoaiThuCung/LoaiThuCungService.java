@@ -1,7 +1,6 @@
 package com.stc.petlove.services.LoaiThuCung;
 
 import com.stc.petlove.dtos.LoaiThuCungDto;
-import com.stc.petlove.entities.DichVu;
 import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.LoaiThuCungRepository;
@@ -23,7 +22,11 @@ public class LoaiThuCungService implements ILoaiThuCungService {
     @Async
     @Override
     public CompletableFuture<LoaiThuCung> create(LoaiThuCungDto input) {
-        LoaiThuCung ltc = new LoaiThuCung();
+        LoaiThuCung ltc = loaiThuCungRepository.findByMaLoaiThuCung(input.getMaLoaiThuCung()).orElse(null);
+        if (ltc != null) {
+            throw new NotFoundException("Mã loại thú cưng đã tồn tại");
+        }
+        ltc = new LoaiThuCung();
         MapperUtils.toDto(input, ltc);
         ltc = loaiThuCungRepository.save(ltc);
         return CompletableFuture.completedFuture(ltc);
@@ -51,6 +54,10 @@ public class LoaiThuCungService implements ILoaiThuCungService {
         LoaiThuCung ltc = loaiThuCungRepository.findById(id).orElse(null);
         if (ltc == null) {
             throw new NotFoundException("Không tìm thấy loại thú cưng");
+        }
+        LoaiThuCung checkLtc = loaiThuCungRepository.findByMaLoaiThuCung(data.getMaLoaiThuCung()).orElse(null);
+        if (checkLtc != null && !checkLtc.getId().equals(id)) {
+            throw new NotFoundException("Mã loại thú cưng đã tồn tại");
         }
         MapperUtils.toDto(data, ltc);
         data = loaiThuCungRepository.save(data);

@@ -3,6 +3,7 @@ package com.stc.petlove.controller;
 import com.stc.petlove.annotations.ApiPrefixController;
 import com.stc.petlove.dtos.AccountDto;
 import com.stc.petlove.dtos.TokenDetail;
+import com.stc.petlove.exceptions.BadRequestException;
 import com.stc.petlove.securities.CustomTaiKhoanDetailService;
 import com.stc.petlove.securities.JwtTokenUtils;
 import com.stc.petlove.securities.JwtUserDetail;
@@ -32,13 +33,16 @@ public class AuthenticationController {
     public ResponseEntity<TokenDetail> login(@Valid @RequestBody AccountDto dto) {
         final JwtUserDetail userDetails = customTaiKhoanDetailService
                 .loadUserByUsername(dto.getUsername());
+        if (!JwtTokenUtils.comparePassword(dto.getPassword(), userDetails.getPassword())){
+            throw new BadRequestException("Password not correct");
+        }
         final TokenDetail result = jwtTokenUtils.getTokenDetail(userDetails);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
     @GetMapping("/hello")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> sayHello(Principal principal) {
         return new ResponseEntity<>(String.format("Hello %s", principal.getName()), HttpStatus.OK);
     }

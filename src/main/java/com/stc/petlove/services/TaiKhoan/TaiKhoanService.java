@@ -1,13 +1,14 @@
 package com.stc.petlove.services.TaiKhoan;
 
 import com.stc.petlove.dtos.TaiKhoanDto;
+import com.stc.petlove.dtos.UpdateProfileDto;
 import com.stc.petlove.entities.TaiKhoan;
 import com.stc.petlove.exceptions.InvalidException;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.TaiKhoanRepository;
+import com.stc.petlove.securities.JwtTokenUtils;
 import com.stc.petlove.utils.MapperUtils;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class TaiKhoanService implements ITaiKhoanService {
             throw new InvalidException("Email đã tồn tại");
         tk = new TaiKhoan();
         MapperUtils.toDto(input, tk);
+        tk.getRoles().add("ROLE_USER");
+        tk.setPassword(JwtTokenUtils.hashPassword(input.getPassword()));
         tk = taiKhoanRepository.save(tk);
         return CompletableFuture.completedFuture(tk);
     }
@@ -58,7 +61,7 @@ public class TaiKhoanService implements ITaiKhoanService {
         if (tk == null) {
             throw new NotFoundException("Không tìm thấy tài khoản");
         }
-        if (data.getEmail().equals(tk.getEmail()))
+        if (data.getEmail().equals(tk.getEmail()) && !data.getId().equals(tk.getId()))
             throw new InvalidException("Email đã tồn tại");
         MapperUtils.toDto(data, tk);
         taiKhoanRepository.save(data);
@@ -91,15 +94,7 @@ public class TaiKhoanService implements ITaiKhoanService {
 
     @Override
     public CompletableFuture<TaiKhoan> getProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String email = "";
-        if (principal instanceof UserDetails) {
-            email = ((UserDetails) principal).getUsername();
-        } else {
-            email = principal.toString();
-        }
-        TaiKhoan tk = taiKhoanRepository.getUser(email).orElse(null);
+        TaiKhoan tk = taiKhoanRepository.getUser(getUserNameFromToken()).orElse(null);
         if (tk == null) {
             throw new NotFoundException("Không tìm thấy tài khoản");
         }
@@ -107,23 +102,30 @@ public class TaiKhoanService implements ITaiKhoanService {
     }
 
     @Override
-    public CompletableFuture<TaiKhoan> updateProfile(TaiKhoan taiKhoan) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
+    public CompletableFuture<TaiKhoan> updateProfile(UpdateProfileDto taiKhoan) {
+
+        TaiKhoan tk = taiKhoanRepository.getUser(getUserNameFromToken()).orElse(null);
+        if (tk == null) {
+            throw new NotFoundException("Không tìm thấy tài khoản");
+        }
+        if (taiKhoan.getEmail() != null) {
+            TaiKhoan checkEmail = taiKhoanRepository.getUser(taiKhoan.getEmail()).orElse(null);
+            if (checkEmail != null && checkEmail.getEmail().equals(taiKhoan.getEmail()) && !checkEmail.getId().equals(tk.getId()))
+                throw new InvalidException("Email đã tồn tại");
+        }
+        MapperUtils.toDto(taiKhoan, tk);
+        tk = taiKhoanRepository.save(tk);
+        return CompletableFuture.completedFuture(tk);
+    }
+
+    private String getUserNameFromToken() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = "";
         if (principal instanceof UserDetails) {
             email = ((UserDetails) principal).getUsername();
         } else {
             email = principal.toString();
         }
-        TaiKhoan tk = taiKhoanRepository.getUser(email).orElse(null);
-        if (tk == null) {
-            throw new NotFoundException("Không tìm thấy tài khoản");
-        }
-        if (taiKhoan.getEmail().equals(tk.getEmail()))
-            throw new InvalidException("Email đã tồn tại");
-        MapperUtils.toDto(taiKhoan, tk);
-        taiKhoanRepository.save(taiKhoan);
-        return CompletableFuture.completedFuture(taiKhoan);
+        return email;
     }
 }

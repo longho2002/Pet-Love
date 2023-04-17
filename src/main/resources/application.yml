@@ -19,7 +19,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
+logging:
+  level:
+    org:
+      springframework:
+        security=DEBUG:
 jwt:
   secret: DBcdCRk9Rr4XTweNddUL4AhcMUtEZsDpyt7VKebvwkC1FaDvlNPBJFFHkPreBq15qmwRO9Bh
 

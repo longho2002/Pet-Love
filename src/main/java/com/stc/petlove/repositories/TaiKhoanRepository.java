@@ -13,4 +13,6 @@ public interface TaiKhoanRepository extends MongoRepository<TaiKhoan, String> {
 
     @Query(value = "{'id': ?0}")
     public Optional<TaiKhoan> findById(String id);
+
+
 }

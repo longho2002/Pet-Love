@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface LoaiThuCungRepository extends MongoRepository<LoaiThuCung, String> {
     @Query(value = "{'id': ?0}")
     public Optional<LoaiThuCung> findById(String id);
-
+    @Query(value = "{'maLoaiThuCung': ?0}")
+    public Optional<LoaiThuCung> findByMaLoaiThuCung(String maLoaiThuCung);
 }

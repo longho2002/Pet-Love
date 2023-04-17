@@ -9,14 +9,14 @@ import java.util.List;
 @Data
 public class DichVuDto {
     // mã dịch vụ không được trùng
-    private String maDichVu;
+    public String maDichVu;
 
 
-    private String tenDichVu;
+    public String tenDichVu;
 
     // nội dung là html
-    private String noiDung;
+    public String noiDung;
 
     // Giá dịch vụ phụ thuộc vào loại thú cưng và cân nặng của thú cưng
-    private List<GiaDichVu> giaDichVus = new ArrayList<>();
+    public List<GiaDichVu> giaDichVus = new ArrayList<>();
 }

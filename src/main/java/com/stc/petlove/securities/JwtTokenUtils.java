@@ -8,6 +8,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtils implements Serializable {
-
+    private static final int COST = 12;
     private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     @Value("${jwt.secret}")
@@ -76,5 +77,10 @@ public class JwtTokenUtils implements Serializable {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
+    public static boolean comparePassword(String password, String storedHash) {
+        return BCrypt.checkpw(password, storedHash);
+    }
+    public static String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(COST));
+    }
 }

@@ -9,8 +9,10 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.Optional;
 
 public interface DichVuRepository extends MongoRepository<DichVu, String> {
-    @Query(value = "{'email': ?0}")
-    Optional<TaiKhoan> getUser(String email);
+
     @Query(value = "{'id': ?0}")
     public Optional<DichVu> findById(String id);
+
+    @Query(value = "{'maDichVu': ?0}")
+    public Optional<DichVu> findByMaDichVu(String id);
 }

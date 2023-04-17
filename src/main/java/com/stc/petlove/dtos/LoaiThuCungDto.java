@@ -6,7 +6,7 @@ import lombok.Data;
 public class LoaiThuCungDto {
 
     // mã không được trùng
-    private String maLoaiThuCung;
+    public String maLoaiThuCung;
 
-    private String tenLoaiThuCung;
+    public String tenLoaiThuCung;
 }

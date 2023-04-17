@@ -2,8 +2,11 @@ package com.stc.petlove.controller;
 
 import com.stc.petlove.annotations.ApiPrefixController;
 import com.stc.petlove.dtos.TaiKhoanDto;
+import com.stc.petlove.dtos.UpdateProfileDto;
 import com.stc.petlove.entities.TaiKhoan;
 import com.stc.petlove.services.TaiKhoan.ITaiKhoanService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,27 +27,49 @@ public class TaiKhoanController {
     }
 
     @GetMapping(value = "/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<TaiKhoan> getOne(@PathVariable(value = "id") String id) {
         return taiKhoanService.getOne(id);
 
     }
+    @GetMapping("/profile")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public CompletableFuture<TaiKhoan> getProfile() {
+        return taiKhoanService.getProfile();
+
+    }
+
+    @PatchMapping("/profile")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public CompletableFuture<TaiKhoan> updateProfile(@RequestBody UpdateProfileDto data) {
+        return taiKhoanService.updateProfile(data);
+    }
 
     @GetMapping()
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<List<TaiKhoan>> getAll() {
         return taiKhoanService.getAll();
     }
 
     @PatchMapping("/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<TaiKhoan> update(@PathVariable(value = "id") String id, @RequestBody TaiKhoan data) {
         return taiKhoanService.update(id, data);
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<Void> remove(@PathVariable(value = "id") String id) {
         return taiKhoanService.remove(id);
     }
 
     @PatchMapping("/setTrangThai/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<TaiKhoan> setTrangThai(@PathVariable(value = "id") String id, @RequestParam(name = "trangthai") boolean trangThai) {
         return taiKhoanService.setTrangThai(id, trangThai);
     }
