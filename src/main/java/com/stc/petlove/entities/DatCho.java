@@ -12,13 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by: IntelliJ IDEA
- * User      : thangpx
- * Date      : 4/11/23
- * Time      : 9:37 PM
- * Filename  : DatCho
- */
+
 @Getter
 @Setter
 @NoArgsConstructor

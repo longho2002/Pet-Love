@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: security
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/pet-love
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+  servlet:
+    multipart:
+      max-request-size: 215MB
+      max-file-size: 200MB
+  task:
+    execution:
+      pool:
+        core-size: 16
+        max-size: 5000
+        queue-capacity: 100
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+jwt:
+  secret: DBcdCRk9Rr4XTweNddUL4AhcMUtEZsDpyt7VKebvwkC1FaDvlNPBJFFHkPreBq15qmwRO9Bh
+
+default:
+  password: test@2022$UTE#
+
+paging:
+  default:
+    page: 0
+    size: 20
+
+file:
+  download_dir: "./downloads"
+  upload_dir: "./uploads"
+
+google:
+  verifyUrl: https://www.googleapis.com/oauth2/v3/userinfo?access_token=
+server:
+  error:
+    include-message: always
+  port: 8080
+
+apiVersion: '"1.0.0"'
+apiTitle: 'Pet Love Core Service'
+apiContactEmail: 'petlove@gmail.com'
+apiDescription: 'This is first version api for Pet Love.'
+apiContactUrl: 'NotFound'
+apiContactName: 'Pet Love Admin'
+#springdoc:
+#  api-docs:
+#    path=/v3/api-docs:

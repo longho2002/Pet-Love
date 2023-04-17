@@ -11,13 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by: IntelliJ IDEA
- * User      : thangpx
- * Date      : 4/11/23
- * Time      : 9:17 PM
- * Filename  : TaiKhoan
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,4 +33,5 @@ public class TaiKhoan {
     private List<String> roles = new ArrayList<>();
 
     private boolean trangThai = true;
+
 }

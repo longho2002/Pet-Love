@@ -5,13 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Created by: IntelliJ IDEA
- * User      : thangpx
- * Date      : 4/11/23
- * Time      : 9:47 PM
- * Filename  : GiaDichVu
- */
+
 @Getter
 @Setter
 @NoArgsConstructor
