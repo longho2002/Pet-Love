@@ -33,5 +33,15 @@ public class TaiKhoan {
     private List<String> roles = new ArrayList<>();
 
     private boolean trangThai = true;
+    public TaiKhoan(String name, String email, String password, String dienThoai, List<String> roles){
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.dienThoai = dienThoai;
+        this.roles = roles;
+
+    }
+
+
 
 }

@@ -1,24 +1,22 @@
 package com.stc.petlove;
 
+import com.stc.petlove.entities.TaiKhoan;
+import com.stc.petlove.repositories.TaiKhoanRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.core.context.SecurityContext;
 
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Collections;
 
 @Slf4j
 @EnableAsync
 @SpringBootApplication
-public class PetLoveApplication {
+public class PetLoveApplication implements CommandLineRunner {
+    @Autowired
+    TaiKhoanRepository taiKhoanRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(PetLoveApplication.class, args);
@@ -28,4 +26,13 @@ public class PetLoveApplication {
     }
 
 
+    @Override
+    public void run(String... args) throws Exception {
+        if (taiKhoanRepository.count() == 0) {
+            TaiKhoan user = new TaiKhoan("20161332", "admin@hcmute.edu.vn", "123456", "12312312", Collections.singletonList("ROLE_ADMIN"));
+            taiKhoanRepository.save(user);
+            user = new TaiKhoan("20161332", "user@hcmute.edu.vn", "123456", "12312312", Collections.singletonList("ROLE_USER"));
+            taiKhoanRepository.save(user);
+        }
+    }
 }
