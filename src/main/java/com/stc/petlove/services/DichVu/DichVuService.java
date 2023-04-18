@@ -35,7 +35,7 @@ public class DichVuService implements IDichVuService {
     @Override
     public CompletableFuture<DichVu> create(DichVuDto input) {
         for (GiaDichVu data : input.getGiaDichVus()) {
-            dichVuRepository.findById(data.getLoaiThuCung()).orElseThrow(() -> new NotFoundException("Không tìm thấy loại thú cưng"));
+            loaiThuCungRepository.findByMaLoaiThuCung(data.getLoaiThuCung()).orElseThrow(() -> new NotFoundException("Không tìm thấy loại thú cưng"));
         }
         DichVu dv = dichVuRepository.findByMaDichVu(input.getMaDichVu()).orElse(null);
         if (dv != null) {
@@ -62,7 +62,7 @@ public class DichVuService implements IDichVuService {
     @Override
     public CompletableFuture<DichVu> update(String id, DichVu input) {
         for (GiaDichVu data : input.getGiaDichVus()) {
-            dichVuRepository.findById(data.getLoaiThuCung()).orElseThrow(() -> new NotFoundException("Không tìm thấy loại thú cưng"));
+            loaiThuCungRepository.findByMaLoaiThuCung(data.getLoaiThuCung()).orElseThrow(() -> new NotFoundException("Không tìm thấy loại thú cưng"));
         }
         DichVu dv = dichVuRepository.findById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy dịch vụ"));
         DichVu checkDv = dichVuRepository.findByMaDichVu(input.getMaDichVu()).orElse(null);

@@ -27,7 +27,7 @@ public class DichVuController {
     @PostMapping(value = "/create")
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<DichVu> create(DichVuDto input) {
+    public CompletableFuture<DichVu> create(@RequestBody DichVuDto input) {
         return dichVuService.create(input);
     }
 
