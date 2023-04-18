@@ -26,7 +26,7 @@ public class DatChoController {
     @PostMapping(value = "/create")
     @SecurityRequirement(name = "Bearer Authentication")
 
-    public CompletableFuture<DatCho> create(DatChoDto input) {
+    public CompletableFuture<DatCho> create( @RequestBody  DatChoDto input) {
         return datChoService.create(input);
     }
 
