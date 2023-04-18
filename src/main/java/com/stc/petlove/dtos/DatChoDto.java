@@ -19,7 +19,4 @@ public class DatChoDto {
 
     // căn dặn khi chăm sóc thú cưng
     public String canDan;
-
-    // lấy từ enum trạng thái đặt chỗ
-    public String trangThaiDatCho;
 }

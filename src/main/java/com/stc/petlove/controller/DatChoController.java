@@ -5,7 +5,6 @@ import com.stc.petlove.dtos.DatChoDto;
 import com.stc.petlove.dtos.PagedResultDto;
 import com.stc.petlove.dtos.Pagination;
 import com.stc.petlove.entities.DatCho;
-import com.stc.petlove.entities.DatCho;
 import com.stc.petlove.services.DatCho.IDatChoService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -58,6 +57,12 @@ public class DatChoController {
         return datChoService.remove(id);
     }
 
+    @PatchMapping("/updateTrangThai/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public CompletableFuture<DatCho> remove(@PathVariable(value = "id") String id, @RequestParam int trangThai) {
+        return datChoService.updateTrangThai(id, trangThai);
+    }
+
 
     @PatchMapping("/setTrangThai/{id}")
     @SecurityRequirement(name = "Bearer Authentication")
@@ -70,8 +75,8 @@ public class DatChoController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PagedResultDto<DatCho> findDatChoWithPaginationAndSearch(@RequestParam(name = "page", defaultValue = "0") int page,
-                                                                        @RequestParam(name = "size", defaultValue = "10") int size,
-                                                                        @RequestParam(name = "content", defaultValue = "") String name) {
+                                                                    @RequestParam(name = "size", defaultValue = "10") int size,
+                                                                    @RequestParam(name = "content", defaultValue = "") String name) {
         CompletableFuture<Long> total = datChoService.countDatCho(name);
         CompletableFuture<List<DatCho>> tks = datChoService.findDatChoWithPaginationAndSearch((long) page * size, size, name);
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(total, tks);

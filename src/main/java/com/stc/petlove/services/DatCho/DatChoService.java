@@ -7,6 +7,7 @@ import com.stc.petlove.entities.embedded.ThongTinDatCho;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.DatChoRepository;
 import com.stc.petlove.repositories.DichVuRepository;
+import com.stc.petlove.utils.EnumTrangThaiDatCho;
 import com.stc.petlove.utils.MapperUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class DatChoService implements IDatChoService {
         dc = datChoRepository.save(dc);
         return CompletableFuture.completedFuture(dc);
     }
+
     @Async
 
     @Override
@@ -46,6 +48,7 @@ public class DatChoService implements IDatChoService {
         }
         return CompletableFuture.completedFuture(dc);
     }
+
     @Async
 
     @Override
@@ -53,6 +56,7 @@ public class DatChoService implements IDatChoService {
         return CompletableFuture.completedFuture(datChoRepository.findAll());
 
     }
+
     @Async
 
     @Override
@@ -68,6 +72,7 @@ public class DatChoService implements IDatChoService {
         data = datChoRepository.save(data);
         return CompletableFuture.completedFuture(data);
     }
+
     @Async
 
     @Override
@@ -104,5 +109,28 @@ public class DatChoService implements IDatChoService {
     public CompletableFuture<Long> countDatCho(String name) {
         return CompletableFuture.supplyAsync(() -> datChoRepository.countDatCho(name).orElse(0L));
 
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<DatCho> updateTrangThai(String id, int status) {
+        DatCho dc = datChoRepository.findById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy đặt chỗ"));
+        switch (status) {
+            case 0: {
+                dc.setTrangThaiDatCho(EnumTrangThaiDatCho.DANG_THUC_HIEN.name());
+                break;
+            }
+            case 1:
+            {
+                dc.setTrangThaiDatCho(EnumTrangThaiDatCho.HOAN_THANH.name());
+                break;
+            }
+            case 2:{
+                dc.setTrangThaiDatCho(EnumTrangThaiDatCho.HUY.name());
+                break;
+            }
+        }
+        dc = datChoRepository.save(dc);
+        return CompletableFuture.completedFuture(dc);
     }
 }

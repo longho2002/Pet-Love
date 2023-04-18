@@ -1,6 +1,7 @@
 package com.stc.petlove.entities;
 
 import com.stc.petlove.entities.embedded.ThongTinDatCho;
+import com.stc.petlove.utils.EnumTrangThaiDatCho;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,7 @@ public class DatCho {
     private String canDan;
 
     // lấy từ enum trạng thái đặt chỗ
-    private String trangThaiDatCho;
+    private String trangThaiDatCho = EnumTrangThaiDatCho.DAT_CHO.name();
 
     private boolean trangThai = true;
 }
