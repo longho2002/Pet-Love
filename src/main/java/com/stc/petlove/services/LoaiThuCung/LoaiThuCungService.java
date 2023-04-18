@@ -1,6 +1,8 @@
 package com.stc.petlove.services.LoaiThuCung;
 
 import com.stc.petlove.dtos.LoaiThuCungDto;
+import com.stc.petlove.entities.DichVu;
+import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.LoaiThuCungRepository;
@@ -86,5 +88,18 @@ public class LoaiThuCungService implements ILoaiThuCungService {
         ltc.setTrangThai(trangThai);
         ltc = loaiThuCungRepository.save(ltc);
         return CompletableFuture.completedFuture(ltc);
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<List<LoaiThuCung>> findLoaiThuCungWithPaginationAndSearch(long skip, int limit, String name) {
+        return CompletableFuture.completedFuture(loaiThuCungRepository.findLoaiThuCungWithPaginationAndSearch(skip, limit, name));
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<Long> countLoaiThuCung(String name) {
+        return CompletableFuture.supplyAsync(() -> loaiThuCungRepository.countLoaiThuCung(name).orElse(0L));
+
     }
 }

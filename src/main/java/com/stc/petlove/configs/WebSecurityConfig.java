@@ -35,6 +35,7 @@ public class WebSecurityConfig {
 
     private final List<String> GETS = Arrays.asList(
             "/api/v1/dichvu/**",
+            "/api/v1/taikhoan/findPaginate**",
             "/api/v1/loaithucung/**"
     );
 

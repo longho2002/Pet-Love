@@ -2,8 +2,10 @@ package com.stc.petlove.controller;
 
 import com.stc.petlove.annotations.ApiPrefixController;
 import com.stc.petlove.dtos.DichVuDto;
+import com.stc.petlove.dtos.PagedResultDto;
+import com.stc.petlove.dtos.Pagination;
 import com.stc.petlove.entities.DichVu;
-import com.stc.petlove.entities.TaiKhoan;
+import com.stc.petlove.entities.embedded.GiaDichVu;
 import com.stc.petlove.services.DichVu.IDichVuService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @ApiPrefixController("/dichvu")
 public class DichVuController {
@@ -58,8 +62,32 @@ public class DichVuController {
     @PatchMapping("/setTrangThai/{id}")
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<DichVu> setTrangThai(@PathVariable(value = "id") String id, @RequestParam(name="trangthai") boolean trangThai)
-    {
+    public CompletableFuture<DichVu> setTrangThai(@PathVariable(value = "id") String id, @RequestParam(name = "trangthai") boolean trangThai) {
         return dichVuService.setTrangThai(id, trangThai);
+    }
+
+    @GetMapping("/findPaginate")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PagedResultDto<DichVu> findDatChoWithPaginationAndSearch(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                    @RequestParam(name = "size", defaultValue = "10") int size,
+                                                                    @RequestParam(name = "content", defaultValue = "") String name) {
+        CompletableFuture<Long> total = dichVuService.countDichVu(name);
+        CompletableFuture<List<DichVu>> tks = dichVuService.findDichVuWithPaginationAndSearch((long) page * size, size, name);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(total, tks);
+        try {
+            allFutures.get();
+            return PagedResultDto.create(Pagination.create(total.get(), (long) page * size, size), tks.get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        throw new RuntimeException("Some thing went wrong!");
+    }
+
+    @GetMapping("/addGiaDichVu/{id}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public CompletableFuture<DichVu> addGiaDichVu(@PathVariable(value = "id") String id, @RequestBody GiaDichVu input) {
+        return dichVuService.addGiaDichVu(id, input);
     }
 }

@@ -91,7 +91,7 @@ public class TaiKhoanService implements ITaiKhoanService {
         tk = taiKhoanRepository.save(tk);
         return CompletableFuture.completedFuture(tk);
     }
-
+    @Async
     @Override
     public CompletableFuture<TaiKhoan> getProfile() {
         TaiKhoan tk = taiKhoanRepository.getUser(getUserNameFromToken()).orElse(null);
@@ -101,6 +101,7 @@ public class TaiKhoanService implements ITaiKhoanService {
         return CompletableFuture.completedFuture(tk);
     }
 
+    @Async
     @Override
     public CompletableFuture<TaiKhoan> updateProfile(UpdateProfileDto taiKhoan) {
 
@@ -116,6 +117,19 @@ public class TaiKhoanService implements ITaiKhoanService {
         MapperUtils.toDto(taiKhoan, tk);
         tk = taiKhoanRepository.save(tk);
         return CompletableFuture.completedFuture(tk);
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<List<TaiKhoan>> findTaiKhoanWithPaginationAndSearch(long skip, int limit, String name) {
+        return CompletableFuture.completedFuture(taiKhoanRepository.findTaiKhoanWithPaginationAndSearch(skip, limit, name));
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<Long> countTaiKhoan(String name) {
+        return CompletableFuture.supplyAsync(() -> taiKhoanRepository.countTaiKhoan(name).orElse(0L));
+
     }
 
     private String getUserNameFromToken() {

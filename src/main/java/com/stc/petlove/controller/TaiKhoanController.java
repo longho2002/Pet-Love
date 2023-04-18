@@ -1,6 +1,8 @@
 package com.stc.petlove.controller;
 
 import com.stc.petlove.annotations.ApiPrefixController;
+import com.stc.petlove.dtos.PagedResultDto;
+import com.stc.petlove.dtos.Pagination;
 import com.stc.petlove.dtos.TaiKhoanDto;
 import com.stc.petlove.dtos.UpdateProfileDto;
 import com.stc.petlove.entities.TaiKhoan;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @ApiPrefixController("/taikhoan")
@@ -72,5 +75,24 @@ public class TaiKhoanController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<TaiKhoan> setTrangThai(@PathVariable(value = "id") String id, @RequestParam(name = "trangthai") boolean trangThai) {
         return taiKhoanService.setTrangThai(id, trangThai);
+    }
+
+
+    @GetMapping("/findPaginate")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PagedResultDto<TaiKhoan> findTaiKhoanWithPaginationAndSearch(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                        @RequestParam(name = "size", defaultValue = "10") int size,
+                                                                        @RequestParam(name = "content", defaultValue = "") String name) {
+        CompletableFuture<Long> total = taiKhoanService.countTaiKhoan(name);
+        CompletableFuture<List<TaiKhoan>> tks = taiKhoanService.findTaiKhoanWithPaginationAndSearch((long) page * size, size, name);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(total, tks);
+        try {
+            allFutures.get();
+            return PagedResultDto.create(Pagination.create(total.get(), (long) page * size, size), tks.get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        throw new RuntimeException("Some thing went wrong!");
     }
 }
