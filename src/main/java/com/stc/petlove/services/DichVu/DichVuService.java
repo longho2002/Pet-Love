@@ -4,26 +4,31 @@ import com.stc.petlove.dtos.DichVuDto;
 import com.stc.petlove.entities.DichVu;
 import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.entities.embedded.GiaDichVu;
-import com.stc.petlove.entities.embedded.ThongTinDatCho;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.DichVuRepository;
 import com.stc.petlove.repositories.LoaiThuCungRepository;
 import com.stc.petlove.utils.MapperUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Service
 public class DichVuService implements IDichVuService {
     private final DichVuRepository dichVuRepository;
     private final LoaiThuCungRepository loaiThuCungRepository;
+    private final MongoTemplate mongoTemplate;
 
-
-    public DichVuService(DichVuRepository dichVuRepository, LoaiThuCungRepository loaiThuCungRepository) {
+    public DichVuService(DichVuRepository dichVuRepository, LoaiThuCungRepository loaiThuCungRepository, MongoTemplate mongoTemplate) {
         this.dichVuRepository = dichVuRepository;
         this.loaiThuCungRepository = loaiThuCungRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Async
@@ -87,8 +92,15 @@ public class DichVuService implements IDichVuService {
 
     @Async
     @Override
-    public CompletableFuture<List<DichVu>> findDichVuWithPaginationAndSearch(long skip, int limit, String name) {
-        return CompletableFuture.completedFuture(dichVuRepository.findDichVuWithPaginationAndSearch(skip, limit, name));
+    public CompletableFuture<List<DichVu>> findDichVuWithPaginationAndSearch(long skip, int limit, String name, String orderBy) {
+//        return CompletableFuture.completedFuture(dichVuRepository.findDichVuWithPaginationAndSearch(skip, limit, name));
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("tenDichVu").regex(Pattern.compile(name, Pattern.CASE_INSENSITIVE))),
+                Aggregation.sort(orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy.contains("-") ? orderBy.substring(0, orderBy.indexOf('-')) : orderBy),
+                Aggregation.skip(skip),
+                Aggregation.limit(limit)
+        );
+        return CompletableFuture.completedFuture(mongoTemplate.aggregate(aggregation, "dich-vu", DichVu.class).getMappedResults());
     }
 
     @Async

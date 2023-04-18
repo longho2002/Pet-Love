@@ -8,6 +8,10 @@ import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.TaiKhoanRepository;
 import com.stc.petlove.securities.JwtTokenUtils;
 import com.stc.petlove.utils.MapperUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,14 +19,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Service
 public class TaiKhoanService implements ITaiKhoanService {
     private final TaiKhoanRepository taiKhoanRepository;
+    private final MongoTemplate mongoTemplate;
 
-    public TaiKhoanService(TaiKhoanRepository taiKhoanRepository) {
+    public TaiKhoanService(TaiKhoanRepository taiKhoanRepository, MongoTemplate mongoTemplate) {
         this.taiKhoanRepository = taiKhoanRepository;
+        this.mongoTemplate = mongoTemplate;
     }
+
 
     @Async
     @Override
@@ -91,6 +99,7 @@ public class TaiKhoanService implements ITaiKhoanService {
         tk = taiKhoanRepository.save(tk);
         return CompletableFuture.completedFuture(tk);
     }
+
     @Async
     @Override
     public CompletableFuture<TaiKhoan> getProfile() {
@@ -121,8 +130,16 @@ public class TaiKhoanService implements ITaiKhoanService {
 
     @Async
     @Override
-    public CompletableFuture<List<TaiKhoan>> findTaiKhoanWithPaginationAndSearch(long skip, int limit, String name) {
-        return CompletableFuture.completedFuture(taiKhoanRepository.findTaiKhoanWithPaginationAndSearch(skip, limit, name));
+    public CompletableFuture<List<TaiKhoan>> findTaiKhoanWithPaginationAndSearch(long skip, int limit, String name, String orderBy) {
+//        return CompletableFuture.completedFuture(taiKhoanRepository.findTaiKhoanWithPaginationAndSearch(skip, limit, name));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("name").regex(Pattern.compile(name, Pattern.CASE_INSENSITIVE))),
+                Aggregation.sort(orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy.contains("-") ? orderBy.substring(0, orderBy.indexOf('-')) : orderBy),
+                Aggregation.skip(skip),
+                Aggregation.limit(limit)
+        );
+        return CompletableFuture.completedFuture(mongoTemplate.aggregate(aggregation, "user", TaiKhoan.class).getMappedResults());
     }
 
     @Async

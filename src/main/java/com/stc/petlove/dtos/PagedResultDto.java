@@ -14,6 +14,6 @@ public class PagedResultDto<TDto> {
         }
 
     public static <TDto>PagedResultDto<TDto> create( Pagination pagination , List<TDto> data) {
-        return new PagedResultDto(pagination, data);
+        return new PagedResultDto<>(pagination, data);
     }
 }

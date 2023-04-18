@@ -1,24 +1,28 @@
 package com.stc.petlove.services.LoaiThuCung;
 
 import com.stc.petlove.dtos.LoaiThuCungDto;
-import com.stc.petlove.entities.DichVu;
-import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.entities.LoaiThuCung;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.LoaiThuCungRepository;
 import com.stc.petlove.utils.MapperUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Service
 public class LoaiThuCungService implements ILoaiThuCungService {
     private final LoaiThuCungRepository loaiThuCungRepository;
-
-    public LoaiThuCungService(LoaiThuCungRepository loaiThuCungRepository) {
+    private final MongoTemplate mongoTemplate;
+    public LoaiThuCungService(LoaiThuCungRepository loaiThuCungRepository, MongoTemplate mongoTemplate) {
         this.loaiThuCungRepository = loaiThuCungRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Async
@@ -92,8 +96,15 @@ public class LoaiThuCungService implements ILoaiThuCungService {
 
     @Async
     @Override
-    public CompletableFuture<List<LoaiThuCung>> findLoaiThuCungWithPaginationAndSearch(long skip, int limit, String name) {
-        return CompletableFuture.completedFuture(loaiThuCungRepository.findLoaiThuCungWithPaginationAndSearch(skip, limit, name));
+    public CompletableFuture<List<LoaiThuCung>> findLoaiThuCungWithPaginationAndSearch(long skip, int limit, String name, String orderBy) {
+//        return CompletableFuture.completedFuture(loaiThuCungRepository.findLoaiThuCungWithPaginationAndSearch(skip, limit, name));
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("tenLoaiThuCung").regex(Pattern.compile(name, Pattern.CASE_INSENSITIVE))),
+                Aggregation.sort(orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy.contains("-") ? orderBy.substring(0, orderBy.indexOf('-')) : orderBy),
+                Aggregation.skip(skip),
+                Aggregation.limit(limit)
+        );
+        return CompletableFuture.completedFuture(mongoTemplate.aggregate(aggregation, "loai-thu-cung", LoaiThuCung.class).getMappedResults());
     }
 
     @Async

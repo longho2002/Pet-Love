@@ -2,6 +2,7 @@ package com.stc.petlove;
 
 import com.stc.petlove.entities.TaiKhoan;
 import com.stc.petlove.repositories.TaiKhoanRepository;
+import com.stc.petlove.securities.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -29,9 +30,9 @@ public class PetLoveApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (taiKhoanRepository.count() == 0) {
-            TaiKhoan user = new TaiKhoan("20161332", "admin@hcmute.edu.vn", "123456", "12312312", Collections.singletonList("ROLE_ADMIN"));
+            TaiKhoan user = new TaiKhoan("20161332", "admin@hcmute.edu.vn", JwtTokenUtils.hashPassword("123456"), "12312312", Collections.singletonList("ROLE_ADMIN"));
             taiKhoanRepository.save(user);
-            user = new TaiKhoan("20161332", "user@hcmute.edu.vn", "123456", "12312312", Collections.singletonList("ROLE_USER"));
+            user = new TaiKhoan("20161332", "user@hcmute.edu.vn", JwtTokenUtils.hashPassword("123456"), "12312312", Collections.singletonList("ROLE_USER"));
             taiKhoanRepository.save(user);
         }
     }

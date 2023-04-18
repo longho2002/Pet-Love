@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface IDichVuService extends IService<DichVu, DichVuDto> {
-    public CompletableFuture<List<DichVu>> findDichVuWithPaginationAndSearch(long skip, int limit, String name);
+    public CompletableFuture<List<DichVu>> findDichVuWithPaginationAndSearch(long skip, int limit, String name, String orderBy);
 
     public CompletableFuture<Long> countDichVu (String name);
 

@@ -83,9 +83,10 @@ public class TaiKhoanController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PagedResultDto<TaiKhoan> findTaiKhoanWithPaginationAndSearch(@RequestParam(name = "page", defaultValue = "0") int page,
                                                                         @RequestParam(name = "size", defaultValue = "10") int size,
-                                                                        @RequestParam(name = "content", defaultValue = "") String name) {
+                                                                        @RequestParam(name = "content", defaultValue = "") String name,
+                                                                        @RequestParam(name = "orderBy", defaultValue = "name") String orderBy) {
         CompletableFuture<Long> total = taiKhoanService.countTaiKhoan(name);
-        CompletableFuture<List<TaiKhoan>> tks = taiKhoanService.findTaiKhoanWithPaginationAndSearch((long) page * size, size, name);
+        CompletableFuture<List<TaiKhoan>> tks = taiKhoanService.findTaiKhoanWithPaginationAndSearch((long) page * size, size, name, orderBy);
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(total, tks);
         try {
             allFutures.get();

@@ -1,9 +1,6 @@
 package com.stc.petlove.repositories;
 
 import com.stc.petlove.entities.DatCho;
-import com.stc.petlove.entities.DatCho;
-import com.stc.petlove.entities.LoaiThuCung;
-import com.stc.petlove.entities.TaiKhoan;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

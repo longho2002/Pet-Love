@@ -4,25 +4,33 @@ import com.stc.petlove.dtos.DatChoDto;
 import com.stc.petlove.entities.DatCho;
 import com.stc.petlove.entities.DichVu;
 import com.stc.petlove.entities.embedded.ThongTinDatCho;
+import com.stc.petlove.exceptions.BadRequestException;
 import com.stc.petlove.exceptions.NotFoundException;
 import com.stc.petlove.repositories.DatChoRepository;
 import com.stc.petlove.repositories.DichVuRepository;
 import com.stc.petlove.utils.EnumTrangThaiDatCho;
 import com.stc.petlove.utils.MapperUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Service
 public class DatChoService implements IDatChoService {
     private final DatChoRepository datChoRepository;
     private final DichVuRepository dichVuRepository;
+    private final MongoTemplate mongoTemplate;
 
-    public DatChoService(DatChoRepository datChoRepository, DichVuRepository dichVuRepository) {
+    public DatChoService(DatChoRepository datChoRepository, DichVuRepository dichVuRepository, MongoTemplate mongoTemplate) {
         this.datChoRepository = datChoRepository;
         this.dichVuRepository = dichVuRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Async
@@ -100,8 +108,15 @@ public class DatChoService implements IDatChoService {
 
     @Async
     @Override
-    public CompletableFuture<List<DatCho>> findDatChoWithPaginationAndSearch(long skip, int limit, String name) {
-        return CompletableFuture.completedFuture(datChoRepository.findDatChoWithPaginationAndSearch(skip, limit, name));
+    public CompletableFuture<List<DatCho>> findDatChoWithPaginationAndSearch(long skip, int limit, String name, String orderBy) {
+//       return CompletableFuture.completedFuture(datChoRepository.findDatChoWithPaginationAndSearch(skip, limit, name, orderBy));
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("email").regex(Pattern.compile(name, Pattern.CASE_INSENSITIVE))),
+                Aggregation.sort(orderBy.contains("-") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy.contains("-") ? orderBy.substring(0, orderBy.indexOf('-')) : orderBy),
+                Aggregation.skip(skip),
+                Aggregation.limit(limit)
+        );
+        return CompletableFuture.completedFuture(mongoTemplate.aggregate(aggregation, "dat-cho", DatCho.class).getMappedResults());
     }
 
     @Async
@@ -120,13 +135,15 @@ public class DatChoService implements IDatChoService {
                 dc.setTrangThaiDatCho(EnumTrangThaiDatCho.DANG_THUC_HIEN.name());
                 break;
             }
-            case 1:
-            {
+            case 1: {
                 dc.setTrangThaiDatCho(EnumTrangThaiDatCho.HOAN_THANH.name());
                 break;
             }
-            case 2:{
-                dc.setTrangThaiDatCho(EnumTrangThaiDatCho.HUY.name());
+            case 2: {
+                if (dc.getTrangThaiDatCho().equals(EnumTrangThaiDatCho.DAT_CHO.name()))
+                    dc.setTrangThaiDatCho(EnumTrangThaiDatCho.HUY.name());
+                else
+                    throw new BadRequestException("Không thể hủy đặt chỗ");
                 break;
             }
         }

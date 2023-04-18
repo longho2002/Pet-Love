@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface IDatChoService extends IService<DatCho, DatChoDto> {
-    public CompletableFuture<List<DatCho>> findDatChoWithPaginationAndSearch(long skip, int limit, String name);
+    public CompletableFuture<List<DatCho>> findDatChoWithPaginationAndSearch(long skip, int limit, String name, String orderBy);
 
     public CompletableFuture<Long> countDatCho (String name);
     public CompletableFuture<DatCho> updateTrangThai (String id ,int status);

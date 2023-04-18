@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface ITaiKhoanService extends IService<TaiKhoan, TaiKhoanDto> {
-    public CompletableFuture<TaiKhoan> getProfile( );
+    public CompletableFuture<TaiKhoan> getProfile();
+
     public CompletableFuture<TaiKhoan> updateProfile(UpdateProfileDto taiKhoan);
 
-    public CompletableFuture<List<TaiKhoan>> findTaiKhoanWithPaginationAndSearch(long skip, int limit,  String name);
+    public CompletableFuture<List<TaiKhoan>> findTaiKhoanWithPaginationAndSearch(long skip, int limit, String name, String orderBy);
 
-    public CompletableFuture<Long> countTaiKhoan (String name);
+    public CompletableFuture<Long> countTaiKhoan(String name);
 }

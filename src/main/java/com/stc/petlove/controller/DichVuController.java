@@ -71,9 +71,10 @@ public class DichVuController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PagedResultDto<DichVu> findDatChoWithPaginationAndSearch(@RequestParam(name = "page", defaultValue = "0") int page,
                                                                     @RequestParam(name = "size", defaultValue = "10") int size,
-                                                                    @RequestParam(name = "content", defaultValue = "") String name) {
+                                                                    @RequestParam(name = "content", defaultValue = "") String name,
+                                                                    @RequestParam(name = "orderBy", defaultValue = "name") String orderBy) {
         CompletableFuture<Long> total = dichVuService.countDichVu(name);
-        CompletableFuture<List<DichVu>> tks = dichVuService.findDichVuWithPaginationAndSearch((long) page * size, size, name);
+        CompletableFuture<List<DichVu>> tks = dichVuService.findDichVuWithPaginationAndSearch((long) page * size, size, name, orderBy);
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(total, tks);
         try {
             allFutures.get();
