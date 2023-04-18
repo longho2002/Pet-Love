@@ -37,7 +37,7 @@ public class DatChoService implements IDatChoService {
     @Override
     public CompletableFuture<DatCho> create(DatChoDto input) {
         for (ThongTinDatCho data : input.getThongTinDatChos()) {
-            DichVu dichVu = dichVuRepository.findById(data.getDichVu()).orElseThrow(() -> new NotFoundException("Không tìm thấy dịch vụ"));
+            DichVu dichVu = dichVuRepository.findByMaDichVu(data.getDichVu()).orElseThrow(() -> new NotFoundException("Không tìm thấy dịch vụ"));
         }
         DatCho dc = new DatCho();
 
@@ -70,7 +70,7 @@ public class DatChoService implements IDatChoService {
     @Override
     public CompletableFuture<DatCho> update(String id, DatCho data) {
         for (ThongTinDatCho x : data.getThongTinDatChos()) {
-            DichVu dichVu = dichVuRepository.findById(x.getDichVu()).orElseThrow(() -> new NotFoundException("Không tìm thấy dịch vụ"));
+            DichVu dichVu = dichVuRepository.findByMaDichVu(x.getDichVu()).orElseThrow(() -> new NotFoundException("Không tìm thấy dịch vụ"));
         }
         DatCho dc = datChoRepository.findById(id).orElse(null);
         if (dc == null) {
